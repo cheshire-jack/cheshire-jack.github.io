@@ -1,0 +1,1 @@
+---\nlayout: tag_index\ntag: random \n---
