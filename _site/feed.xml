@@ -7,27 +7,162 @@
 		<atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
-				<title>Adventures in Malwareland</title>
-				<description>&lt;p&gt;This is the start of a new project for me.  I am very interested in malware.  How to detect it, how to analyze it, reverse engineer it, and how it does what it does.  (I’m using malware pretty broadly here to include many classes of software used for nefarious purposes.)&lt;/p&gt;
+				<title>Malloc and the Heap p.1</title>
+				<description>&lt;h3 id=&quot;malloc&quot;&gt;malloc()&lt;/h3&gt;
+&lt;p&gt;When programming in C we can dynamically allocate memory for objects that are created during runtime.  To do this we use a function callled &lt;em&gt;malloc()&lt;/em&gt;.  This allocates memory in the heap section of program memory.  From the man page for &lt;em&gt;malloc()&lt;/em&gt; we see that it has the following attributes:&lt;/p&gt;
 
-&lt;h2 id=&quot;100-files-to-analyze&quot;&gt;100 Files to analyze&lt;/h2&gt;
-
-&lt;p&gt;Because there is an abundance of malware projects available in various places on the internet I have decided to just start picking them apart and learning everything I can from them.  I will begin with some of the more simplistic samples I can find and work up to more complicated samples from there.&lt;/p&gt;
-
-&lt;p&gt;Why 100 files?  Because it seems like a good starting point and an achievable goal with everything else I have going on.  It also seems like I should be able to find 100 samples with source code without having to look too hard.  (I fully expect to encounter some that are of low quality and full of bad ideas.)&lt;/p&gt;
-
-&lt;h2 id=&quot;the-goal&quot;&gt;The Goal&lt;/h2&gt;
-
-&lt;p&gt;For any project I like to have a set of goals I’m working towards.  In this case I have three goals.&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;First I want to gain a much deeper understanding of the code that goes into malware.  I’m a very visual learner so seeing the code and dissecting it helps me a lot.&lt;/li&gt;
-  &lt;li&gt;Second I want to develop my static analysis and reverse engineering skills.  By dissecting these files and then digging into the assembly I can gain a deeper understanding of the relationship between the two.&lt;/li&gt;
-  &lt;li&gt;Third I want to start developing my own methodology for malware analysis.  Experiment with developing custom tools, frameworks, lab environments, etc.  This is a good way to get that going.&lt;/li&gt;
+  &lt;li&gt;defined in stdlib.h&lt;/li&gt;
+  &lt;li&gt;function definition: void *malloc(size_t size)&lt;/li&gt;
+  &lt;li&gt;allocates memory of size &lt;em&gt;size&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;returns a pointer to the memory if successful and a NULL pointer if not&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;using-malloc&quot;&gt;Using malloc()&lt;/h3&gt;
+&lt;p&gt;Lets use malloc() in a program to create a linked list data structure.&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;second&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;third&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fourth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fifth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;malloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;malloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;third&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;malloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;fourth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;malloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+  	&lt;span class=&quot;n&quot;&gt;fifth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;malloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;third&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;third&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;third&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fourth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;fourth&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;fourth&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fifth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;fifth&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;fifth&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This program is a simple implementation of a linked list.  We use &lt;em&gt;malloc()&lt;/em&gt; to allocate the size of each node on the heap during runtime. Lets go through the code carefully to understand what is happening.&lt;/p&gt;
+
+&lt;p&gt;At (1) we declare the struct for each linked list object.  Then in the &lt;em&gt;main&lt;/em&gt; function at (2) we initialize a pointer to each Node we are going to create to NULL value.  Remember here that a pointer is storing a memory address.&lt;/p&gt;
+
+&lt;p&gt;Next at (3) we are assigning values to each linked list node by using the fact that on success &lt;em&gt;malloc()&lt;/em&gt; returns a pointer to the allocated memory.  We take that pointer and cast it as a Node* pointer to assign it to each linked list element.  The size of the memory in this case is given by &lt;em&gt;sizeof(struct Node)&lt;/em&gt; which is the size of each Node object.  It turns out that the memory size allocated will have to be a minimum size that will contain an int value and a pointer value (typically 4 bytes and 8 bytes respectively on a 64 bit machine).&lt;/p&gt;
+
+&lt;p&gt;The next section of our code (4) is where we assign values to the data member of the structs and the pointer member of the strcut.&lt;/p&gt;
+
+&lt;h3 id=&quot;looking-at-a-lower-level&quot;&gt;Looking at a lower level&lt;/h3&gt;
+&lt;p&gt;In this section we are going to look at what happens at the assembly level of our previous program.  I compiled the program using gcc 8.1.1 and then used Binary Ninja to look at the disassembled binary.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/malloc1-0.jpg&quot; alt=&quot;malloc disassembly&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Starting at the address 0x624 we can see the initialization code setting the value of each node to NULL.  Then we see starting at address 0x64c moving the &lt;em&gt;size&lt;/em&gt; argument for &lt;em&gt;malloc()&lt;/em&gt; into the edi register to pass to &lt;em&gt;malloc()&lt;/em&gt; when we call the function at 0x651.  As we can see each call to &lt;em&gt;malloc()&lt;/em&gt; is allocating 16 bytes on the heap.  Then we are setting the value in rax (the return value of &lt;em&gt;malloc()&lt;/em&gt;) to the allocated pointer from our previous section.&lt;/p&gt;
+
+&lt;p&gt;The next section starting at address 0x692 is where we start assigning values to our struct members in the linked list.  First we move the address of our node into register rax.  Then we move the value of the data member to that address.  After that we need to populate the next pointer in the struct.  To do that we store the addresses of the node we are at and the next node into rax and rdx respectively.  Then we store the next node address in rdx to rax+0x8 which is the location of the pointer storage.&lt;/p&gt;
+
+&lt;h3 id=&quot;issues-using-malloc&quot;&gt;Issues using malloc()&lt;/h3&gt;
+&lt;p&gt;Now that we have an idea of what &lt;em&gt;malloc()&lt;/em&gt; does and what it looks like at a lower level we can look at some mistakes that programmers can make with &lt;em&gt;malloc()&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;One mistake that can be made when using &lt;em&gt;malloc()&lt;/em&gt; is to assume that the memory is initialized when it is not.  If the memory is then used without intializing it a disclosure of data could occur.&lt;/p&gt;
+
+&lt;p&gt;Failing to check the return value of &lt;em&gt;malloc()&lt;/em&gt; is another mistake.  This can cause a NULL pointer dereference which can lead to an exploit.&lt;/p&gt;
+
+&lt;p&gt;Using memory after &lt;em&gt;free()&lt;/em&gt; is another issue which may lead to an exploitable vulnerability.  Along with using &lt;em&gt;free()&lt;/em&gt; on the same memory multiple times.&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;Hopefully you found something useful in this post.  In part 2 I am going to go over some vulnerable code using &lt;em&gt;malloc()&lt;/em&gt; and look at how the vulnerabilities can be exploited.&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.geeksforgeeks.org&quot; target=&quot;_blank&quot;&gt;GeeksforGeeks&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.amazon.com/Secure-Coding-SEI-Software-Engineering-ebook/dp/B00C0OBZI0/ref=sr_1_1?ie=UTF8&amp;amp;qid=1532068474&amp;amp;sr=8-1&amp;amp;keywords=secure+coding+in+c+and+c%2B%2B%2C+2nd+edition&quot; target=&quot;_blank&quot;&gt;Secure Coding in C and C++&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://nostarch.com/tlpi&quot; target=&quot;_blank&quot;&gt;The Linux Programming Interface&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
-				<pubDate>Sat, 10 Feb 2018 00:00:00 -0700</pubDate>
-				<link>http://localhost:4000/2018/02/Adventures</link>
-				<guid isPermaLink="true">http://localhost:4000/2018/02/Adventures</guid>
+				<pubDate>Thu, 19 Jul 2018 00:00:00 -0600</pubDate>
+				<link>http://localhost:4000/2018/07/MallocAndHeap</link>
+				<guid isPermaLink="true">http://localhost:4000/2018/07/MallocAndHeap</guid>
+			</item>
+		
+			<item>
+				<title>Research Methodology</title>
+				<description>&lt;h2 id=&quot;what&quot;&gt;What&lt;/h2&gt;
+&lt;p&gt;Research is a task like any other.  It is a byproduct of asking a question and seeking an answer.  Sometimes you get the answer you are looking for.  Sometimes you learn a lot of things besides the answer to the question.&lt;/p&gt;
+
+&lt;p&gt;There are ways to make research more efficient and maximize your chance of success.  In this post I will go over how I approach research in my field.  This methodology works for me in the type of research I find myself doing.  As with anything of this nature what works for me may not work for you, so take what you can from this and make it your own.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-one--formalize-the-question&quot;&gt;Step One:  Formalize the Question&lt;/h3&gt;
+&lt;p&gt;Imagine that we are going to do some research on a software application.  How you pose your question has an impact on what kind of decisions you make about your research.  Lets consider some questions.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Question 1: Is there a vulnerability?&lt;/li&gt;
+  &lt;li&gt;Question 2: Is there a memory corruption vulnerability?&lt;/li&gt;
+  &lt;li&gt;Question 3: Is there a buffer overflow vulnerability that is exploitable via a remote connection?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To answer question 1 we would need to go through the entire application and get as much code coverage as possible.  We would want to check for every type of applicable vulnerability for that code base.  Even then we may not be able to guarantee there are no vulnerabilities in the code 100%.  (There is some notion of proving 100% vulnerability free code but I’m not aware of the specifics enough to claim it here.)&lt;/p&gt;
+
+&lt;p&gt;To answer question 2 we restrict ourselves to a certain class of vulnerability.  Once we find our answer for that class of vulnerability our job is done.  We don’t care about if other vulnerabilities exist outside of that scope for our research.&lt;/p&gt;
+
+&lt;p&gt;Question 3 is a very specific question.  The easiest answer would come if our application has no remote connections possible.  If we could prove that is the case no further research is needed.  Question answered.&lt;/p&gt;
+
+&lt;p&gt;As you can see the question asked determines the course of action taken later in the researching phases.  A properly defined question will make the scope of the research clear.  An improperly defined question will make the scope unfortunate and may wind up being an example for others not to emulate.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-two--information-gathering&quot;&gt;Step Two:  Information Gathering&lt;/h3&gt;
+&lt;p&gt;Once you have a clear question it’s time to go find out as much as you possibly can about the subject of the question.  Some of the information will be helpful some will not.&lt;/p&gt;
+
+&lt;p&gt;In this phase the purpose is to discover what I am actually working with.  For example if I have a piece of software that I’m unfamiliar with and I want to do vulnerability research I will focus my search on areas relating to that.  I would want to answer some preliminary questions.  For example:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;What are common ways that type of software is put together?&lt;/li&gt;
+  &lt;li&gt;What are common vulnerabilities that type of software contains?&lt;/li&gt;
+  &lt;li&gt;Is that vendor prone to making certain types of programming mistakes?&lt;/li&gt;
+  &lt;li&gt;Are there manuals listing out the complete functionality of the software and its components? (Or any of it?)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This stage depends a lot on how much previous experience is brought to the research.  For example, if you have done development on the type of software you are researching you would alredy have an idea of how the software is constructed.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-three-plan-your-approach&quot;&gt;Step Three: Plan Your Approach&lt;/h3&gt;
+&lt;p&gt;To proceed we need to have a plan.  That plan needs to map out or approach but also be flexible enough to adapt to changes.  My goal is to have a guide to make sure that I stay on task and make progress, not to have a step by step process that I can use in any scenario.&lt;/p&gt;
+
+&lt;p&gt;This stage should keep the queestion in sight as the ultimate goal of the research.  You can start choosing tools that will fit your research scenario most effectively.  You can also start narrowing down vectors that you believe will lead you to results.&lt;/p&gt;
+
+&lt;p&gt;Experience will be valuable but it is not a requirement.  You gain experience by doing.  If you are not sure where to start you can pick a task you believe will get you results and evaluate that approach when you start the research phase.&lt;/p&gt;
+
+&lt;p&gt;You can also rely on other researchers experience in this phase.  In our software example we could fall back on texts like &lt;a href=&quot;https://www.amazon.com/Art-Software-Security-Assessment-Vulnerabilities-ebook/dp/B004XVIWU2/ref=sr_1_1?ie=UTF8&amp;amp;qid=1532024648&amp;amp;sr=8-1&amp;amp;keywords=the+art+for+software+security&quot; target=&quot;_blank&quot;&gt;The Art of Software Security Assesment&lt;/a&gt;.  In the information gathering phase you may have come accross blog posts or technical write ups of similar research engagements.  If that is the case you can model after approaches that worked for those engagements.  I would not dismiss appraoches that did not yield results unless you can see why they would not yield results for your research though.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-four-start-researching&quot;&gt;Step Four: Start Researching&lt;/h3&gt;
+&lt;p&gt;Once you have a plan in place you can start on carrying out the research.  Following your plan and adjusting where necessary.&lt;/p&gt;
+
+&lt;p&gt;While I am doing the actual research, and even during the previous stages I take a lot of notes.  I always have a notebook where I write down what I try and what happens.  I also try to include what I am thinking at the time.  Then when I am done I convert that paper copy into a digital copy so that I can do an after action review to reinforce what I learn.&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;I have tried to keep this methodology as general as possible.  There are books that have been written on this subject that I have never read.  I have developed this way of doing things by seeing what others have done and what has worked well for me in the past.  I still keep an open mind in aletering any of the steps based on what the current scenario is.  Hopefully this has been helpful to you.&lt;/p&gt;
+</description>
+				<pubDate>Wed, 18 Jul 2018 00:00:00 -0600</pubDate>
+				<link>http://localhost:4000/2018/07/ResearchMethodology</link>
+				<guid isPermaLink="true">http://localhost:4000/2018/07/ResearchMethodology</guid>
 			</item>
 		
 	</channel>

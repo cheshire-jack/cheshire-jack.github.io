@@ -4,11 +4,11 @@ body { padding-top: 80px; color: #dddddd; background: #292929 url(./pics/triangl
 
 .main-page { width: 75%; }
 
-h1 { font-size: 2em; }
+h1 { font-size: 2em; color: #1496bb; }
 
-h2 { font-size: 1.5em; }
+h2 { font-size: 1.5em; color: #1496bb; }
 
-h3 { font-size: 1.17em; }
+h3 { font-size: 1.17em; color: #1496bb; }
 
 h4 { font-size: 1.12em; }
 
@@ -22,12 +22,12 @@ img + em { display: block; margin-left: auto; margin-right: auto; text-align: ce
 
 blockquote { color: #bbb; font-size: 1em; }
 
-a { color: #3CA2A2; }
+a { color: #1496bb; }
 
 ul.social-media { text-align: center; padding: 0 0 10px 0; }
 ul.social-media li { display: inline-block; }
 ul.social-media li > a { width: 45px; height: 45px; -webkit-transition: color 0.2s; -moz-transition: color 0.2s; -ms-transition: color 0.2s; -o-transition: color 0.2s; transition: color 0.2s; display: inline-block; color: white; }
-ul.social-media li > a:hover { color: #3CA2A2; }
+ul.social-media li > a:hover { color: #1496bb; }
 
 .share-bar { text-align: right; }
 
@@ -75,7 +75,7 @@ nav.navbar { -webkit-transition: all 0.7s ease; transition: all 0.7s ease; }
 
 nav.navbar.shrink { min-height: 15px; }
 
-.navbar-brand { font-size: 30px; color: #3CA2A2; }
+.navbar-brand { font-size: 30px; color: #1496bb; }
 
 nav.shrink a { padding-top: 10px !important; padding-bottom: 10px !important; font-size: 15px; }
 

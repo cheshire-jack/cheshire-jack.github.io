@@ -17,12 +17,13 @@
 //********************************************************
 
 // Several accent colors, choose one or create your own!
-$accent-color: #3CA2A2;    // original =)
+//$accent-color: #3CA2A2;    // original =)
 //$accent-color: #C38FD6;  // velvet
 //$accent-color: #8FD6B3;  // greenish
 //$accent-color: #35B4DE;  // bluish
 //$accent-color: #D2E354;  // yellowish
 //$accent-color: #52B54B;  // green
+$accent-color: #1496bb;
 
 $font-color: #dddddd;
 $background-color: #292929;
@@ -50,9 +51,9 @@ body {
   width: 75%;
 }
 
-h1 { font-size: 2em; }
-h2 { font-size: 1.5em; }
-h3 { font-size: 1.17em; }
+h1 { font-size: 2em; color: #1496bb;}
+h2 { font-size: 1.5em; color: #1496bb;}
+h3 { font-size: 1.17em; color: #1496bb;}
 h4 { font-size: 1.12em; }
 h5 { font-size: .83em; }
 h6 { font-size: .75em; }

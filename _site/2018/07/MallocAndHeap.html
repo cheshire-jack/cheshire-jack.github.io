@@ -1,0 +1,270 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cheshire Jack | Malloc and the Heap p.1 </title>
+  <meta name="theme-color" content="#222222" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/toc.js"></script>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/theme.css" rel="stylesheet">
+  <link href="/css/syntax.css" rel="stylesheet">
+  <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+  
+
+  
+
+
+ <script type="text/javascript">
+  WebFontConfig = {
+    google: {
+      families: ['Ubuntu::latin']
+    }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Cheshire Jack</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/">/home</a></li>
+          <li><a href="/archive.html">/archive</a></li>
+          <li><a href="/tags.html">/tags</a></li>
+          <li><a href="/about.html">/about</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <div class="wrapper">
+      <div class="content">
+        <div class="container container-center">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="article">
+                <div class="well">
+                  <h1><a href="/2018/07/MallocAndHeap">Malloc and the Heap p.1</a></h1>
+                  <div class="post-meta">
+                    <div class="post-time">
+                      <i class="fa fa-calendar"></i>
+                      <time>19 Jul 2018</time>
+                    </div>
+                    <ul>
+                      
+                        <li><a href="/tag/linux">linux</a></li>
+                      
+                        <li><a href="/tag/programming">programming</a></li>
+                      
+                        <li><a href="/tag/C">C</a></li>
+                      
+                    </ul>
+                  </div>
+                  <div class="post-content">
+                    <div id="toc" class="toc"></div>
+                    <h3 id="malloc">malloc()</h3>
+<p>When programming in C we can dynamically allocate memory for objects that are created during runtime.  To do this we use a function callled <em>malloc()</em>.  This allocates memory in the heap section of program memory.  From the man page for <em>malloc()</em> we see that it has the following attributes:</p>
+
+<ul>
+  <li>defined in stdlib.h</li>
+  <li>function definition: void *malloc(size_t size)</li>
+  <li>allocates memory of size <em>size</em></li>
+  <li>returns a pointer to the memory if successful and a NULL pointer if not</li>
+</ul>
+
+<h3 id="using-malloc">Using malloc()</h3>
+<p>Lets use malloc() in a program to create a linked list data structure.</p>
+
+<div class="language-c highlighter-rouge"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">struct</span> <span class="n">Node</span> <span class="p">{</span>
+	<span class="kt">int</span> <span class="n">data</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">Node</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+	<span class="k">struct</span> <span class="n">Node</span><span class="o">*</span> <span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">Node</span><span class="o">*</span> <span class="n">second</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">Node</span><span class="o">*</span> <span class="n">third</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">Node</span><span class="o">*</span> <span class="n">fourth</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">Node</span><span class="o">*</span> <span class="n">fifth</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+	<span class="n">head</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="p">));</span>
+	<span class="n">second</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="p">));</span>
+	<span class="n">third</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="p">));</span>
+	<span class="n">fourth</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="p">));</span>
+  	<span class="n">fifth</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Node</span><span class="p">));</span>
+  <span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+	<span class="n">head</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">second</span><span class="p">;</span>
+
+	<span class="n">second</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+	<span class="n">second</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">third</span><span class="p">;</span>
+
+	<span class="n">third</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+	<span class="n">third</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">fourth</span><span class="p">;</span>
+
+	<span class="n">fourth</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+	<span class="n">fourth</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">fifth</span><span class="p">;</span>
+
+	<span class="n">fifth</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+	<span class="n">fifth</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre>
+</div>
+
+<p>This program is a simple implementation of a linked list.  We use <em>malloc()</em> to allocate the size of each node on the heap during runtime. Lets go through the code carefully to understand what is happening.</p>
+
+<p>At (1) we declare the struct for each linked list object.  Then in the <em>main</em> function at (2) we initialize a pointer to each Node we are going to create to NULL value.  Remember here that a pointer is storing a memory address.</p>
+
+<p>Next at (3) we are assigning values to each linked list node by using the fact that on success <em>malloc()</em> returns a pointer to the allocated memory.  We take that pointer and cast it as a Node* pointer to assign it to each linked list element.  The size of the memory in this case is given by <em>sizeof(struct Node)</em> which is the size of each Node object.  It turns out that the memory size allocated will have to be a minimum size that will contain an int value and a pointer value (typically 4 bytes and 8 bytes respectively on a 64 bit machine).</p>
+
+<p>The next section of our code (4) is where we assign values to the data member of the structs and the pointer member of the strcut.</p>
+
+<h3 id="looking-at-a-lower-level">Looking at a lower level</h3>
+<p>In this section we are going to look at what happens at the assembly level of our previous program.  I compiled the program using gcc 8.1.1 and then used Binary Ninja to look at the disassembled binary.</p>
+
+<p><img src="/images/malloc1-0.jpg" alt="malloc disassembly" /></p>
+
+<p>Starting at the address 0x624 we can see the initialization code setting the value of each node to NULL.  Then we see starting at address 0x64c moving the <em>size</em> argument for <em>malloc()</em> into the edi register to pass to <em>malloc()</em> when we call the function at 0x651.  As we can see each call to <em>malloc()</em> is allocating 16 bytes on the heap.  Then we are setting the value in rax (the return value of <em>malloc()</em>) to the allocated pointer from our previous section.</p>
+
+<p>The next section starting at address 0x692 is where we start assigning values to our struct members in the linked list.  First we move the address of our node into register rax.  Then we move the value of the data member to that address.  After that we need to populate the next pointer in the struct.  To do that we store the addresses of the node we are at and the next node into rax and rdx respectively.  Then we store the next node address in rdx to rax+0x8 which is the location of the pointer storage.</p>
+
+<h3 id="issues-using-malloc">Issues using malloc()</h3>
+<p>Now that we have an idea of what <em>malloc()</em> does and what it looks like at a lower level we can look at some mistakes that programmers can make with <em>malloc()</em>.</p>
+
+<p>One mistake that can be made when using <em>malloc()</em> is to assume that the memory is initialized when it is not.  If the memory is then used without intializing it a disclosure of data could occur.</p>
+
+<p>Failing to check the return value of <em>malloc()</em> is another mistake.  This can cause a NULL pointer dereference which can lead to an exploit.</p>
+
+<p>Using memory after <em>free()</em> is another issue which may lead to an exploitable vulnerability.  Along with using <em>free()</em> on the same memory multiple times.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Hopefully you found something useful in this post.  In part 2 I am going to go over some vulnerable code using <em>malloc()</em> and look at how the vulnerabilities can be exploited.</p>
+
+<h3 id="references">References</h3>
+<ul>
+  <li><a href="https://www.geeksforgeeks.org" target="_blank">GeeksforGeeks</a></li>
+  <li><a href="https://www.amazon.com/Secure-Coding-SEI-Software-Engineering-ebook/dp/B00C0OBZI0/ref=sr_1_1?ie=UTF8&amp;qid=1532068474&amp;sr=8-1&amp;keywords=secure+coding+in+c+and+c%2B%2B%2C+2nd+edition" target="_blank">Secure Coding in C and C++</a></li>
+  <li><a href="https://nostarch.com/tlpi" target="_blank">The Linux Programming Interface</a></li>
+</ul>
+
+                    
+
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 hidden-xs">
+              <div class="sidebar ">
+  <h2>Recent Posts</h2>
+  <ul>
+    
+    <li><a href="/2018/07/MallocAndHeap">Malloc and the Heap p.1</a></li>
+    
+    <li><a href="/2018/07/ResearchMethodology">Research Methodology</a></li>
+    
+  </ul>
+</div>
+
+<div class="sidebar">
+  <h2>Tags</h2>
+  <ul class="sideBarTags">
+    
+    
+    <li>
+      <a href="/tag/C" data-toggle="tooltip" data-placement="right" title="1">
+        <span>C</span></a></li>
+    
+    <li>
+      <a href="/tag/linux" data-toggle="tooltip" data-placement="right" title="1">
+        <span>linux</span></a></li>
+    
+    <li>
+      <a href="/tag/programming" data-toggle="tooltip" data-placement="right" title="1">
+        <span>programming</span></a></li>
+    
+    <li>
+      <a href="/tag/research" data-toggle="tooltip" data-placement="right" title="1">
+        <span>research</span></a></li>
+    
+  </ul>
+</div>
+
+            </div>
+          </div>
+        </div>
+        
+
+      </div>
+          <footer class="footer-distributed">
+      <div class="container">
+        <div class="footer">
+          <p>Cheshire Jack &copy; 2017</p>
+          <h6>Follow me</h6>
+
+<ul class="social-media">
+
+  
+    <li>
+      <a title="cheshire-jack on Github" href="https://github.com/cheshire-jack" target="_blank"><i class="fa fa-github fa-2x"></i></a>
+    </li>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <li>
+      <a title="feed.xml RSS" href="/feed.xml" target="_blank"><i class="fa fa-rss fa-2x"></i></a>
+    </li>
+  
+
+  
+    <li>
+      <a title="Mental_3ntropy on Twitter" href="https://twitter.com/Mental_3ntropy" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+    </li>
+  
+</ul>
+
+        </div>
+      </div>
+    </footer>
+
+    </div>
+  </body>
+</html>
