@@ -1,1 +1,4 @@
----\nlayout: tag_index\ntag: research \n---
+---
+layout: tag_index
+tag: research 
+---

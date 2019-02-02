@@ -4,12 +4,26 @@ title: About
 
 ---
 
-# Hi I'm Jack
+# I'm Jack
 
-Thanks for checking out my blog.   
+## Expereince
+* Reverse Engineering
+* Vulnerability Research
+* Static Analysis
+* Programming in C, C++, and some others
+* Applied Mathematics
+* Linux and Windows
 
-My main interests are reverse engineering, vulnerability research, program analysis and mathematics.  I tend to focus on Linux but am interested in Windows and Android as well.    
+## Community
+If you want to find me you can reach out via:
+* netsecfocus on Mattermost (I recommend joining it's a great community with knowledgable people)
+* @Mental_3ntropy on Twitter
+* Jack Shannon on LinkedIn
+* cheshire-jack on Github
 
-You can find me on NetSecFocus Mattermost and Twitter.  Feel free to send any thoughts my way.
+  
+## Blog
+I write this blog to document and review what I've learned about topics that interest me.  I hope that it will be helpful to others.
 
+## Credit Where Credit is Due
 The template for this site has come from [streetturtle](https://github.com/streetturtle/jekyll-clean-dark)
